@@ -5,8 +5,8 @@
         {
             "type": "vcs",
             "url": "https://github.com/borasocom-team/Magento-ExtraEvents"
-        },
-  ]
+        }
+  ],
   "require": {
 	"boraso/extraevents": "*"
     }

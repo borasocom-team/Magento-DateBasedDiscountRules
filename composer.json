@@ -1,0 +1,8 @@
+{
+  "name": "Boraso/DateBasedDiscountRules",
+  "type": "magento-module",
+  "require": {
+	"boraso/extraevents": "*"
+    }
+}
+

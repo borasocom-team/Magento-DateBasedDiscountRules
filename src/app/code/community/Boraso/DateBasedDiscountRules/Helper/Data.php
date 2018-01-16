@@ -1,0 +1,139 @@
+<?php
+
+class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstract
+{
+    protected $todayDateForDB;
+
+    public function __construct()
+    {
+        $this->todayDateForDB = date("Y-m-d");
+    }
+
+    public function updateCatalogRules()
+    {
+        $this->log("##### SECTION: updateCatalogRules() #####", "=");
+
+        $arrAllRules = Mage::getModel("catalogrule/rule")->getCollection();
+        $modRulesModel = Mage::getModel("boraso_datebaseddiscountrules/catalogrules");
+
+        $arrCompatibleRules = $modRulesModel->toArray();
+        $arrSelectedRules   = $modRulesModel->getSelectedRules();
+        $arrReport = array('deleted' => array(), 'kept' => array(), 'skipped' => array(), "err" => array());
+
+        foreach ($arrAllRules as $rule) {
+
+            $rule_id = $rule->getId();
+            $rule_name = $rule->getName();
+
+            $this->log("### Processing a catalogrule", "-");
+            $this->log("#" . $rule_name . "# [" . $rule_id . "]");
+
+            if ( !array_key_exists($rule_id, $arrCompatibleRules) ) {
+
+                $this->log("This rule is missing a condition on the _to_date, thus is not compatible. Skipping.");
+                $arrReport['skipped'][] = $rule_name;
+                continue;
+            }
+
+            if ( !array_key_exists($rule_id, $arrSelectedRules) ) {
+
+                $this->log("This rule is compatible, but it's not selected for processing in the module admin section. Skipping.");
+                $arrReport['skipped'][] = $rule_name;
+                continue;
+            }
+
+
+            $this->log("Rule is selected - Processing..");
+            $esito = $this->updateCatalogRule($rule);
+
+            if (empty($esito)) {
+
+                $this->log("Success: rule updated");
+                $arrReport['deleted'][] = $rule_name;
+
+            } else {
+
+                $this->log("Warning: rule NOT updated");
+                $this->log($esito);
+                $arrReport['err'][] = $rule_name;
+            }
+        }
+
+        $this->log("### Report", "*");
+
+        foreach ($arrReport as $key => $val) {
+
+            $this->log(ucfirst($key) . ": " . count($val));
+        }
+
+        return $arrReport;
+    }
+
+
+
+    protected function updateCatalogRule(Mage_CatalogRule_Model_Rule $rule)
+    {
+        $txtConditionsSerialized    = $rule->getConditionsSerialized();
+        $arrConditions              = unserialize($txtConditionsSerialized);
+
+        if(!is_array($arrConditions) || empty($arrConditions["conditions"])) {
+
+            $message = "!!! CRITICAL ERROR - Unable to unserialize conditions ###" . $txtConditionsSerialized . "###";
+            return $message;
+        }
+
+
+        $updateNeeded = false;
+        foreach($arrConditions["conditions"] as &$condition) {
+
+            if(
+                !empty($condition["attribute"]) &&
+                preg_match("/[a-z]+_(from|to)_date$/i", $condition["attribute"]) &&
+                $condition["attribute"] != $this->todayDateForDB
+            ){
+                $condition["value"] = date("Y-m-d");
+                $updateNeeded       = true;
+            }
+        }
+
+
+        if($updateNeeded === false) {
+
+            return null;
+        }
+
+
+        $txtConditionsSerialized = serialize($arrConditions);
+
+        try {
+            $rule->setConditionsSerialized($txtConditionsSerialized);
+            $rule->save();
+
+        } catch (Exception $ex) {
+
+            $message = "!!! CRITICAL ERROR - Exception, unable to update conditions: " . $ex->getMessage();
+            return $message;
+        }
+
+        return null;
+    }
+
+
+    protected function log($message, $titleSeparator = false)
+    {
+        $filename = "boraso_datebaseddiscountrules.log";
+
+        if($titleSeparator) {
+
+            Mage::log("", null, $filename);
+        }
+
+
+        Mage::log($message, null, $filename);
+
+        if($titleSeparator) {
+
+            Mage::log( str_repeat($titleSeparator, mb_strlen($message)), null, $filename );
+        }
+    }
+}

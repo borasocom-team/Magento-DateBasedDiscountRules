@@ -1,6 +1,12 @@
 {
   "name": "Boraso/DateBasedDiscountRules",
   "type": "magento-module",
+  "repositories" : [
+        {
+            "type": "vcs",
+            "url": "https://github.com/borasocom-team/Magento-ExtraEvents"
+        },
+  ]
   "require": {
 	"boraso/extraevents": "*"
     }

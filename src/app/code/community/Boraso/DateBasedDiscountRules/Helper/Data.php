@@ -4,9 +4,25 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
 {
     protected $todayDateForDB;
 
+    protected $sqlUpdateRuleCondition   = "
+                                            UPDATE 
+                                              catalogrule 
+                                            SET
+                                              conditions_serialized = :conditions_serialized 
+                                            WHERE 
+                                              rule_id               = :rule_id
+                                        ";
+
+    protected $stmtUpdateRuleCondition;
+    protected $dbw;
+
     public function __construct()
     {
-        $this->todayDateForDB = date("Y-m-d") . " 00:00:00";
+        $this->todayDateForDB           = Mage::getStoreConfig('boraso_datebaseddiscountrules/settings/datetime_workaround')
+                                            ? strtotime('today') //00:00:00 current date
+                                            : date("Y-m-d");
+        $this->dbw                      = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $this->stmtUpdateRuleCondition  = $this->dbw->prepare($this->sqlUpdateRuleCondition);
     }
 
     public function updateCatalogRules()
@@ -89,9 +105,10 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
             if(
                 !empty($condition["attribute"]) &&
                 preg_match("/[a-z]+_(from|to)_date$/i", $condition["attribute"]) &&
-                $condition["attribute"] != $this->todayDateForDB
+                $condition["value"] != $this->todayDateForDB
             ){
                 $condition["value"] = $this->todayDateForDB;
+                $condition["Boraso_DateBasedDiscountRules"] = "This rule was modified by Boraso/DateBasedDiscountRules";
                 $updateNeeded       = true;
             }
         }
@@ -102,12 +119,14 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
             return null;
         }
 
-
-        $txtConditionsSerialized = serialize($arrConditions);
+        $arrPram    = array(
+                        "conditions_serialized" => serialize($arrConditions),
+                        "rule_id"               => $rule->getId()
+                    );
 
         try {
-            $rule->setConditionsSerialized($txtConditionsSerialized);
-            $rule->save();
+
+            $this->stmtUpdateRuleCondition->execute($arrPram);
 
         } catch (Exception $ex) {
 

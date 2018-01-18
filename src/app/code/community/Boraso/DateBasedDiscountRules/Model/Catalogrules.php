@@ -24,6 +24,7 @@ class Boraso_DateBasedDiscountRules_Model_Catalogrules
                                     FROM
                                         catalogrule
                                     WHERE
+                                        conditions_serialized LIKE '%\_from\_date%' OR
                                         conditions_serialized LIKE '%\_to\_date%'
                                     ORDER BY
                                         is_active ASC, name ASC

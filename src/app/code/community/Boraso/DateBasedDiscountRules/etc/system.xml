@@ -35,6 +35,19 @@
                             </depends>
                         </enabled_for_catalogrules_list>
 
+                        <datetime_workaround translate="label">
+                            <label>
+                                <![CDATA[Enable <a href="https://magento.stackexchange.com/questions/210006/catalog-price-rules-with-date-as-conditions-cannot-possibly-work-due-to-strtotim">strtotime() workaround</a>]]>
+                            </label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <depends>
+                                <modenabled>1</modenabled>
+                            </depends>
+                        </datetime_workaround>
+
                     </fields>
                 </settings>
             </groups>

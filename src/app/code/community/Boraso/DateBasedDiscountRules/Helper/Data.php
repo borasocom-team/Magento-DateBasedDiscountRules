@@ -6,7 +6,7 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
 
     public function __construct()
     {
-        $this->todayDateForDB = date("Y-m-d");
+        $this->todayDateForDB = date("Y-m-d") . " 00:00:00";
     }
 
     public function updateCatalogRules()
@@ -91,7 +91,7 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
                 preg_match("/[a-z]+_(from|to)_date$/i", $condition["attribute"]) &&
                 $condition["attribute"] != $this->todayDateForDB
             ){
-                $condition["value"] = date("Y-m-d");
+                $condition["value"] = $this->todayDateForDB;
                 $updateNeeded       = true;
             }
         }

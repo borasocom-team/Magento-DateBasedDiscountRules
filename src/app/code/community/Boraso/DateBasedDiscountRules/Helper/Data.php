@@ -18,9 +18,7 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
 
     public function __construct()
     {
-        $this->todayDateForDB           = Mage::getStoreConfig('boraso_datebaseddiscountrules/settings/datetime_workaround')
-                                            ? strtotime('today') //00:00:00 current date
-                                            : date("Y-m-d");
+        $this->todayDateForDB           = date("Y-m-d");
         $this->dbw                      = Mage::getSingleton('core/resource')->getConnection('core_write');
         $this->stmtUpdateRuleCondition  = $this->dbw->prepare($this->sqlUpdateRuleCondition);
     }
@@ -108,7 +106,7 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
                 $condition["value"] != $this->todayDateForDB
             ){
                 $condition["value"] = $this->todayDateForDB;
-                $condition["Boraso_DateBasedDiscountRules"] = "This rule was modified by Boraso/DateBasedDiscountRules";
+                $condition["Boraso_DateBasedDiscountRules"] = "This rule was modified by Boraso/DateBasedDiscountRules (this key is FYI, not a technical need)";
                 $updateNeeded       = true;
             }
         }
@@ -154,5 +152,19 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
 
             Mage::log( str_repeat($titleSeparator, mb_strlen($message)), null, $filename );
         }
+    }
+
+
+
+    public function _prepareDatetimeValue($value, $object, $origin)
+    {
+        $attribute = $object->getResource()->getAttribute($origin->getAttribute());
+        if ($attribute && $attribute->getBackendType() == 'datetime') {
+            $origin->setValue(strtotime($origin->getValue()));
+            if (is_scalar($value)) {
+                $value = strtotime($value);
+            }
+        }
+        return $value;
     }
 }

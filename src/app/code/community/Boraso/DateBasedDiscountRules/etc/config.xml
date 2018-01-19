@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Boraso_DateBasedDiscountRules>
-            <version>0.1.6</version>
+            <version>0.2.0</version>
         </Boraso_DateBasedDiscountRules>
     </modules>
     <global>
@@ -29,10 +29,21 @@
                     <boraso_datebaseddiscountrules_catalogrule_apply_all_before_observer>
                         <type>singleton</type>
                         <class>boraso_datebaseddiscountrules/observer</class>
-                        <method>run</method>
+                        <method>updateCatalogRules</method>
                     </boraso_datebaseddiscountrules_catalogrule_apply_all_before_observer>
                 </observers>
             </catalogrule_apply_all_before>
+
+            <catalogrule_condition_product_prepareDatetimeValue_after>
+                <observers>
+                    <boraso_datebaseddiscountrules_catalogrule_condition_product_prepareDatetimeValue_after_observer>
+                        <type>singleton</type>
+                        <class>boraso_datebaseddiscountrules/observer</class>
+                        <method>_prepareDatetimeValue</method>
+                    </boraso_datebaseddiscountrules_catalogrule_condition_product_prepareDatetimeValue_after_observer>
+                </observers>
+            </catalogrule_condition_product_prepareDatetimeValue_after>
+
         </events>
 
     </global>

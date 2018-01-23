@@ -153,18 +153,4 @@ class Boraso_DateBasedDiscountRules_Helper_Data extends Mage_Core_Helper_Abstrac
             Mage::log( str_repeat($titleSeparator, mb_strlen($message)), null, $filename );
         }
     }
-
-
-
-    public function _prepareDatetimeValue($value, $object, $origin)
-    {
-        $attribute = $object->getResource()->getAttribute($origin->getAttribute());
-        if ($attribute && $attribute->getBackendType() == 'datetime') {
-            $origin->setValue(strtotime($origin->getValue()));
-            if (is_scalar($value)) {
-                $value = strtotime($value);
-            }
-        }
-        return $value;
-    }
 }

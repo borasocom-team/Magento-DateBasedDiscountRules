@@ -2,21 +2,26 @@
 <config>
     <modules>
         <Boraso_DateBasedDiscountRules>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </Boraso_DateBasedDiscountRules>
     </modules>
     <global>
+
         <models>
             <boraso_datebaseddiscountrules>
                 <class>Boraso_DateBasedDiscountRules_Model</class>
                 <resourceModel>boraso_datebaseddiscountrules_resource</resourceModel>
             </boraso_datebaseddiscountrules>
+
+
+            <catalogrule>
+                <rewrite>
+                    <rule_condition_product>Boraso_DateBasedDiscountRules_Model_Mage_CatalogRule_Rule_Condition_Product</rule_condition_product>
+                </rewrite>
+            </catalogrule>
         </models>
-        <blocks>
-            <boraso_datebaseddiscountrules>
-                <class>Boraso_DateBasedDiscountRules_Block</class>
-            </boraso_datebaseddiscountrules>
-        </blocks>
+
+
         <helpers>
             <boraso_datebaseddiscountrules>
                 <class>Boraso_DateBasedDiscountRules_Helper</class>
@@ -34,7 +39,7 @@
                 </observers>
             </catalogrule_apply_all_before>
 
-            <catalogrule_condition_product_prepareDatetimeValue_after>
+            <!--catalogrule_condition_product_prepareDatetimeValue_after>
                 <observers>
                     <boraso_datebaseddiscountrules_catalogrule_condition_product_prepareDatetimeValue_after_observer>
                         <type>singleton</type>
@@ -42,18 +47,20 @@
                         <method>_prepareDatetimeValue</method>
                     </boraso_datebaseddiscountrules_catalogrule_condition_product_prepareDatetimeValue_after_observer>
                 </observers>
-            </catalogrule_condition_product_prepareDatetimeValue_after>
+            </catalogrule_condition_product_prepareDatetimeValue_after-->
 
         </events>
 
     </global>
 
     <default>
+
         <boraso_datebaseddiscountrules>
             <settings>
                 <modenabled>1</modenabled>
                 <datetime_workaround>1</datetime_workaround>
             </settings>
         </boraso_datebaseddiscountrules>
+
     </default>
 </config>
